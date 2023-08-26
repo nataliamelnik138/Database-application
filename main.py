@@ -9,35 +9,35 @@ list_employers_id = [4606627, 41862, 78638, 39305, 5189187, 44272, 1714731, 2966
 
 
 def main():
-    # employers = get_information_about_employers(list_employers_id)
-    #
-    # vacancies = {}
-    # key = 1
-    # for employer_id in list_employers_id:
-    #     vacancies[key] = get_vacancies(employer_id)
-    #     key += 1
+    employers = get_information_about_employers(list_employers_id)
+
+    vacancies = {}
+    key = 1
+    for employer_id in list_employers_id:
+        vacancies[key] = get_vacancies(employer_id)
+        key += 1
 
     params = config()
     db_name = 'my_db'
 
-    # create_database(params, db_name)
+    create_database(params, db_name)
     print("База данных успешно создана")
     params.update({'dbname': db_name})
 
-    # try:
-    #     with psycopg2.connect(**params) as conn:
-    #         with conn.cursor() as cur:
-    #             create_employers_table(cur)
-    #             print("Таблица employers успешно создана")
-    #             create_vacancies_table(cur)
-    #             print("Таблица vacancies успешно создана")
-    #             insert_data(cur, employers, vacancies)
-    #             print("Данные в таблицы успешно добавлены")
-    # except(Exception, psycopg2.DatabaseError) as error:
-    #     print(error)
-    # finally:
-    #     if conn is not None:
-    #         conn.close()
+    try:
+        with psycopg2.connect(**params) as conn:
+            with conn.cursor() as cur:
+                create_employers_table(cur)
+                print("Таблица employers успешно создана")
+                create_vacancies_table(cur)
+                print("Таблица vacancies успешно создана")
+                insert_data(cur, employers, vacancies)
+                print("Данные в таблицы успешно добавлены")
+    except(Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
 
     print("\nСписок компаний и количество вакансий у каждой компании:")
     request_1 = DBManager(params).get_companies_and_vacancies_count()
@@ -63,6 +63,9 @@ def main():
     request_5 = DBManager(params).get_vacancies_with_keyword(keyword)
     for row in request_5:
         print(row[0])
+
+    # Закрываем курсор и соединение с БД
+    DBManager(params).closes_the_connection_to_the_database()
 
 
 if __name__ == "__main__":
